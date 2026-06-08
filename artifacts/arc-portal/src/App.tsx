@@ -1,0 +1,68 @@
+import { Switch, Route, Router as WouterRouter } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import NotFound from "@/pages/not-found";
+
+// Page Imports
+import Dashboard from "./pages/dashboard";
+import RequestList from "./pages/request-list";
+import RequestForm from "./pages/request-form";
+import RequestDetail from "./pages/request-detail";
+import SessionsPage from "./pages/sessions";
+import OutcomesPage from "./pages/outcomes";
+import LeanixInitiatives from "./pages/leanix-initiatives";
+import KpisPage from "./pages/kpis";
+import ExecutiveDashboardPage from "./pages/executive-dashboard";
+import ProcessGuidePage from "./pages/process-guide";
+import AdminPage from "./pages/admin";
+import KnowledgeBaseIndex from "./pages/knowledge-base-index";
+import KnowledgeBaseDetail from "./pages/knowledge-base-detail";
+import KnowledgeBaseForm from "./pages/knowledge-base-form";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    }
+  }
+});
+
+function Router() {
+  return (
+    <Switch>
+      <Route path="/" component={Dashboard} />
+      <Route path="/requests" component={RequestList} />
+      <Route path="/requests/new" component={RequestForm} />
+      <Route path="/requests/:id" component={RequestDetail} />
+      <Route path="/leanix" component={LeanixInitiatives} />
+      <Route path="/sessions" component={SessionsPage} />
+      <Route path="/outcomes" component={OutcomesPage} />
+      <Route path="/kpis" component={KpisPage} />
+      <Route path="/executive-dashboard" component={ExecutiveDashboardPage} />
+      <Route path="/process-guide" component={ProcessGuidePage} />
+      <Route path="/admin" component={AdminPage} />
+      <Route path="/knowledge-base/new" component={KnowledgeBaseForm} />
+      <Route path="/knowledge-base/:id/edit" component={KnowledgeBaseForm} />
+      <Route path="/knowledge-base/:id" component={KnowledgeBaseDetail} />
+      <Route path="/knowledge-base" component={KnowledgeBaseIndex} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <Router />
+        </WouterRouter>
+        <Toaster />
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
