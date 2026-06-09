@@ -18,17 +18,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 1. Install pnpm tool on the runner
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9 # Change this if you use pnpm v10 or v11 locally
+
+      # 2. Set up Node.js and cache pnpm dependencies
       - name: Set up Node.js version
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '22.x'
+          cache: 'pnpm'
 
-      - name: npm install, build, and test
+      # 3. Use pnpm instead of npm for dependencies and building
+      - name: pnpm install, build, and test
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          pnpm install
+          pnpm run build --if-present
+          pnpm run test --if-present
 
+      # 4. Upload your built files for Azure
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
