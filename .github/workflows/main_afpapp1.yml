@@ -1,74 +1,147 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+
 # More GitHub Actions for Azure: https://github.com/Azure/actions
+
+
 
 name: Build and deploy Node.js app to Azure Web App - AFPapp1
 
+
+
 on:
+
   push:
+
     branches:
+
       - main
+
   workflow_dispatch:
 
+
+
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
+
     permissions:
+
       contents: read #This is required for actions/checkout
 
+
+
     steps:
+
       - uses: actions/checkout@v4
 
+
+
       # 1. Install pnpm tool on the runner
+
       - name: Install pnpm
+
         uses: pnpm/action-setup@v4
+
         with:
+
           version: 9 # Change this if you use pnpm v10 or v11 locally
 
+
+
       # 2. Set up Node.js and cache pnpm dependencies
+
       - name: Set up Node.js version
+
         uses: actions/setup-node@v4
+
         with:
+
           node-version: '22.x'
+
           cache: 'pnpm'
 
-      # 3. Use pnpm instead of npm for dependencies and building (Bypassing frozen lockfile)
+
+
+      # 3. Use pnpm instead of npm for dependencies and building
+
       - name: pnpm install, build, and test
+
         run: |
-          pnpm install --no-frozen-lockfile
+
+          pnpm install
+
           pnpm run build --if-present
+
           pnpm run test --if-present
 
+
+
       # 4. Upload your built files for Azure
+
       - name: Upload artifact for deployment job
+
         uses: actions/upload-artifact@v4
+
         with:
+
           name: node-app
+
           path: .
 
+
+
   deploy:
+
     runs-on: ubuntu-latest
+
     needs: build
+
     permissions:
+
       id-token: write #This is required for requesting the JWT
+
       contents: read #This is required for actions/checkout
 
+
+
     steps:
+
       - name: Download artifact from build job
+
         uses: actions/download-artifact@v4
+
         with:
+
           name: node-app
-        
+
+      
+
       - name: Login to Azure
+
         uses: azure/login@v2
+
         with:
+
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F7760C173D174F1C96F504C38F9ECD99 }}
+
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_6E35AC919F83427AA41611BA80128EF6 }}
+
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_4FD8CCB6DAAA4DDCA989A7B497A6FC0D }}
 
+
+
       - name: 'Deploy to Azure Web App'
+
         id: deploy-to-webapp
+
         uses: azure/webapps-deploy@v3
+
         with:
+
           app-name: 'AFPapp1'
+
           slot-name: 'Production'
+
           package: .
